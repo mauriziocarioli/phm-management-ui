@@ -13,4 +13,5 @@ public class TaskSummaryObjectList {
     public void setTaskSummaryObjects(List<TaskSummaryObject> taskSummaryObjects) {
         this.taskSummaryObjects = taskSummaryObjects;
     }
+
 }

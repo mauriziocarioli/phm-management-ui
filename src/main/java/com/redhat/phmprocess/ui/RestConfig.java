@@ -8,8 +8,10 @@ import org.springframework.web.filter.CorsFilter;
 
 @Configuration
 public class RestConfig {
+
     @Bean
     public CorsFilter corsFilter() {
+
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowCredentials(true);
@@ -21,5 +23,7 @@ public class RestConfig {
         config.addAllowedMethod("DELETE");
         source.registerCorsConfiguration("/**", config);
         return new CorsFilter(source);
+
     }
+
 }

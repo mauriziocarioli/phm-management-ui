@@ -6,6 +6,7 @@ public class TaskSummaryObject {
     private String taskContainerId;
     private String summaryOfChanges;
     private String processInstanceId;
+    private String owner;
 
     public String getOwner() {
         return owner;
@@ -14,10 +15,6 @@ public class TaskSummaryObject {
     public void setOwner(String owner) {
         this.owner = owner;
     }
-
-    private String owner;
-
-
 
     public String getTaskId() {
         return taskId;
@@ -42,7 +39,6 @@ public class TaskSummaryObject {
     public void setSummaryOfChanges(String summaryOfChanges) {
         this.summaryOfChanges = summaryOfChanges;
     }
-
 
     public String getProcessInstanceId() {
         return processInstanceId;

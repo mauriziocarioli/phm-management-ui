@@ -14,9 +14,6 @@ package com.redhat.phmprocess.ui;/*
  *  You may elect to redistribute this code under either of these licenses.
  */
 
-
-
-
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Vertx;
 import io.vertx.core.json.Json;
@@ -31,11 +28,7 @@ import java.util.Map;
 /**
  * @author <a href="http://tfox.org">Tim Fox</a>
  */
-
 public class PHMUIVerticle extends AbstractVerticle {
-
-	public static final String BASIC_AUTH="Basic cGFtQWRtaW46cmVkaGF0cGFtMSE=";
-
 
 	// Convenience method so you can run it in your IDE
 	public static void main(String[] args) {
@@ -43,78 +36,88 @@ public class PHMUIVerticle extends AbstractVerticle {
 		vertxWebUI.start();
 	}
 
-
+	public static final String BASIC_AUTH="Basic cGFtQWRtaW46cmVkaGF0cGFtMSE=";
 	static Vertx vertx = Vertx.vertx();
-
-
 
 	@Override
 	public void start() {
 
-		Router router = Router.router(vertx);
+		Router router = Router
+							.router(vertx);
+		router
+			.route().handler(BodyHandler.create());
+		router
+			.route("/static/*")
+				.handler(StaticHandler.create("webroot"));
+		router
+			.get("/getTasksDashboard/:userId")
+				.handler(this::getTaskDashboard);
+		router
+			.get("/getTaskDetails/:taskId")
+				.handler(this::getTaskDetails);
+		router
+			.post("/approve/:taskId/:userId/:close/:processInstanceId")
+				.handler(this::approve);
+		vertx
+			.createHttpServer()
+				.requestHandler(router)
+					.listen(8037);
 
-		router.route().handler(BodyHandler.create());
-
-		router.route("/static/*").handler(StaticHandler.create("webroot"));
-
-		router.get("/getTasksDashboard/:userId").handler(this::getTaskDashboard);
-
-		router.get("/getTaskDetails/:taskId").handler(this::getTaskDetails);
-
-		router.post("/approve/:taskId/:userId/:close/:processInstanceId").handler(this::approve);
-
-
-		vertx.createHttpServer().requestHandler(router).listen(8037);
 	}
 
 	//Approve Changes
 	private void approve(RoutingContext routingContext) {
+
 		try {
 			String taskId = routingContext.request().getParam("taskId");
 			String userId = routingContext.request().getParam("userId");
 			String close = routingContext.request().getParam("close");
 			String processInstanceId = routingContext.request().getParam("processInstanceId");
 			TaskHandlerUtil.approveOrReject(taskId,userId,routingContext.getBodyAsString(),close,processInstanceId);
-			routingContext.response().setStatusCode(200).putHeader("content-type", "application/json")
-					.end(Json.encodePrettily("Approved"));
-
+			routingContext
+				.response()
+					.setStatusCode(200)
+						.putHeader("content-type", "application/json")
+							.end(Json.encodePrettily("Approved"));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
-
 	}
-
 
 	//Get Task Dashboard
 	private void getTaskDashboard(RoutingContext routingContext) {
+
 		String userId = routingContext.request().getParam("userId");
 		try {
 			List<TaskSummaryObject> taskSummary = TaskHandlerUtil.fetchDashboardData(userId);
 			System.out.println(taskSummary);
-			routingContext.response().setStatusCode(201).putHeader("content-type", "application/json")
-					.end(Json.encodePrettily(taskSummary));
-
+			routingContext.response()
+				.setStatusCode(201)
+					.putHeader("content-type", "application/json")
+						.end(Json.encodePrettily(taskSummary));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+
 	}
 
 	//Get Task Details
 	private void getTaskDetails(RoutingContext routingContext) {
+
 		try {
 			String taskId = routingContext.request().getParam("taskId");
 			Map taskSummary = TaskHandlerUtil.getTaskSummary(taskId,BASIC_AUTH);
 			System.out.println(taskSummary);
-			routingContext.response().setStatusCode(201).putHeader("content-type", "application/json")
-					.end(Json.encodePrettily(taskSummary));
-
+			routingContext
+				.response()
+					.setStatusCode(201)
+						.putHeader("content-type", "application/json")
+							.end(Json.encodePrettily(taskSummary));
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 
 	}
-
-
 
 }
