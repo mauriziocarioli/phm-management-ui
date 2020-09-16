@@ -34,6 +34,7 @@
 
 # generated files #
 ######################
+**/bin
 .DS_Store
 .DS_Store?
 ._*
